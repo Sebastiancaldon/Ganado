@@ -1,28 +1,33 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const app = express();
+const db = require('./models');
+require('dotenv').config();
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
-var app = express();
-
-app.use(logger('dev'));
+// Middleware para leer JSON
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+// 🔌 MONTAR rutas
+const authRoutes = require('./routes/auth'); // 👈 importa rutas
+app.use('/auth', authRoutes);                // 👈 activa /auth/register
 
-module.exports = app;
+const ganadoRoutes = require('./routes/ganado');
+app.use('/ganado', ganadoRoutes);
 
-const db = require("./models");
+// Ruta de prueba
+app.get('/', (req, res) => {
+  res.send('🐄 Servidor funcionando');
+});
 
-// Sincronizar la base de datos
-db.sequelize.sync();
+// Base de datos
+db.sequelize.sync({ alter: true })
 
-const ganadoRouter = require("./routes/ganado");
-app.use("/ganado", ganadoRouter);
+  .then(() => console.log("✅ Base de datos sincronizada"))
+  .catch(err => console.error("❌ Error de DB:", err));
+
+
+
+const produccionRoutes = require('./routes/produccion');
+app.use('/produccion', produccionRoutes);
+
+module.exports = app; // 👈 IMPORTANTE si usas bin/www

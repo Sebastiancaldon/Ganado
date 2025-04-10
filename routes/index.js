@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const db = require('../models');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -7,3 +8,10 @@ router.get('/', function(req, res, next) {
 });
 
 module.exports = router;
+
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
+

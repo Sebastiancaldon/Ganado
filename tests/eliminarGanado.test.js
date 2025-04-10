@@ -3,7 +3,7 @@ const app = require('../app');
 
 describe('API de Ganado - Eliminar', () => {
   test('Debe eliminar un ganado', async () => {
-    const idAEliminar = 15; // Reemplaza con un ID válido
+    const idAEliminar = 17; // Reemplaza con un ID válido
 
     const response = await request(app).delete(`/ganado/${idAEliminar}`);
     expect(response.status).toBe(200);
