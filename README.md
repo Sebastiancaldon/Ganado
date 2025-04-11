@@ -108,10 +108,9 @@ Esto iniciará el backend y cargará el **menú interactivo** en consola con **I
 
 ```
 ├── models/             # Modelos de Sequelize
-├── controllers/        # Lógica de negocio
+├── controllers/        # Lógica
 ├── routes/             # Rutas protegidas y públicas
 ├── config/             # Configuración de Sequelize
-├── database/           # Migraciones y seeders
 ├── middlewares/        # Autenticación y validaciones
 ├── menu.js     # Menú interactivo en consola
 ├── app.js              # Configuración de Express
