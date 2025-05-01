@@ -84,6 +84,7 @@ async function iniciarSesion() {
     const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
     usuario = payload;
     //console.log('🔑 Token recibido:', token);
+    
     //console.log('📦 Payload decodificado:', usuario);
 
     console.log(`✅ Bienvenido, ${usuario.nombre}`);

@@ -1,10 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { Ganado } = require("../models"); // Asegúrate que exista en models/index.js
-const verificarToken = require('../middleware/authMiddleware');
-
+const { Ganado } = require("../models");
+const { verificarToken } = require('../middlewares/authMiddleware'); // ✅ Solo una vez
 const jwt = require('jsonwebtoken');
-
 
 // Registrar nuevo ganado
 router.post('/registrar', verificarToken, async (req, res) => {
@@ -12,7 +10,6 @@ router.post('/registrar', verificarToken, async (req, res) => {
     const nuevoGanado = await Ganado.create({
       ...req.body,
       usuario_id: req.user.id
-
     });
     res.status(201).json(nuevoGanado);
   } catch (error) {
@@ -20,6 +17,7 @@ router.post('/registrar', verificarToken, async (req, res) => {
   }
 });
 
+// Obtener ganado por usuario
 router.get('/', verificarToken, async (req, res) => {
   try {
     const usuarioId = req.user.id;
@@ -32,7 +30,7 @@ router.get('/', verificarToken, async (req, res) => {
   }
 });
 
-
+// Eliminar animal
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -47,4 +45,3 @@ router.delete("/:id", async (req, res) => {
 });
 
 module.exports = router;
-
