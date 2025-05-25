@@ -1,0 +1,1122 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AgroTrack API",
+    "description": "API para el sistema de gestión ganadera AgroTrack",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Equipo AgroTrack",
+      "email": "info@agrotrack.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Servidor de desarrollo"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "Usuario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "cedula": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Ganado": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usuarioId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "identificacion": {
+            "type": "string"
+          },
+          "raza": {
+            "type": "string"
+          },
+          "fechaNacimiento": {
+            "type": "string",
+            "format": "date"
+          },
+          "sexo": {
+            "type": "string",
+            "enum": ["Macho", "Hembra"]
+          },
+          "peso": {
+            "type": "number",
+            "format": "float"
+          },
+          "estado": {
+            "type": "string",
+            "enum": ["Activo", "Vendido", "Fallecido"]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Produccion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "animalId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tipoProduccion": {
+            "type": "string",
+            "enum": ["leche", "carne"]
+          },
+          "cantidad": {
+            "type": "number",
+            "format": "float"
+          },
+          "fechaRegistro": {
+            "type": "string",
+            "format": "date"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Registrar un nuevo usuario",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["nombre", "cedula", "password"],
+                "properties": {
+                  "nombre": {
+                    "type": "string"
+                  },
+                  "cedula": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario registrado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario registrado exitosamente"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "example": "Juan Pérez"
+                        },
+                        "cedula": {
+                          "type": "string",
+                          "example": "1234567890"
+                        },
+                        "token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ya existe un usuario con esta cédula"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": ["Autenticación"],
+        "summary": "Iniciar sesión",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["cedula", "password"],
+                "properties": {
+                  "cedula": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string",
+                    "format": "password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Inicio de sesión exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Inicio de sesión exitoso"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer",
+                          "example": 1
+                        },
+                        "nombre": {
+                          "type": "string",
+                          "example": "Juan Pérez"
+                        },
+                        "cedula": {
+                          "type": "string",
+                          "example": "1234567890"
+                        },
+                        "token": {
+                          "type": "string",
+                          "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/auth/profile": {
+      "get": {
+        "tags": ["Autenticación"],
+        "summary": "Obtener perfil del usuario",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Perfil del usuario",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Usuario"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/ganado": {
+      "get": {
+        "tags": ["Ganado"],
+        "summary": "Obtener todos los registros de ganado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "raza",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtrar por raza"
+          },
+          {
+            "in": "query",
+            "name": "sexo",
+            "schema": {
+              "type": "string",
+              "enum": ["Macho", "Hembra"]
+            },
+            "description": "Filtrar por sexo"
+          },
+          {
+            "in": "query",
+            "name": "estado",
+            "schema": {
+              "type": "string",
+              "enum": ["Activo", "Vendido", "Fallecido"]
+            },
+            "description": "Filtrar por estado"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Ordenar resultados (ej. peso:asc)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de registros de ganado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Ganado"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Ganado"],
+        "summary": "Crear un nuevo registro de ganado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["identificacion", "raza", "fechaNacimiento", "sexo", "peso"],
+                "properties": {
+                  "identificacion": {
+                    "type": "string"
+                  },
+                  "raza": {
+                    "type": "string"
+                  },
+                  "fechaNacimiento": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sexo": {
+                    "type": "string",
+                    "enum": ["Macho", "Hembra"]
+                  },
+                  "peso": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "estado": {
+                    "type": "string",
+                    "enum": ["Activo", "Vendido", "Fallecido"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registro de ganado creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Registro de ganado creado exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Ganado"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ya existe un animal con esta identificación"
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/ganado/{id}": {
+      "get": {
+        "tags": ["Ganado"],
+        "summary": "Obtener un registro de ganado por ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del registro de ganado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registro de ganado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Ganado"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Ganado"],
+        "summary": "Actualizar un registro de ganado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del registro de ganado"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "identificacion": {
+                    "type": "string"
+                  },
+                  "raza": {
+                    "type": "string"
+                  },
+                  "fechaNacimiento": {
+                    "type": "string",
+                    "format": "date"
+                  },
+                  "sexo": {
+                    "type": "string",
+                    "enum": ["Macho", "Hembra"]
+                  },
+                  "peso": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "estado": {
+                    "type": "string",
+                    "enum": ["Activo", "Vendido", "Fallecido"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registro de ganado actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Registro de ganado actualizado exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Ganado"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ya existe un animal con esta identificación"
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Ganado"],
+        "summary": "Eliminar un registro de ganado",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del registro de ganado"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registro de ganado eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Registro de ganado eliminado exitosamente"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/produccion": {
+      "get": {
+        "tags": ["Producción"],
+        "summary": "Obtener todos los registros de producción",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "animalId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filtrar por ID del animal"
+          },
+          {
+            "in": "query",
+            "name": "tipoProduccion",
+            "schema": {
+              "type": "string",
+              "enum": ["leche", "carne"]
+            },
+            "description": "Filtrar por tipo de producción"
+          },
+          {
+            "in": "query",
+            "name": "fechaInicio",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Fecha de inicio para filtrar"
+          },
+          {
+            "in": "query",
+            "name": "fechaFin",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Fecha de fin para filtrar"
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Ordenar resultados (ej. cantidad:desc)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de registros de producción",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Produccion"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      },
+      "post": {
+        "tags": ["Producción"],
+        "summary": "Crear un nuevo registro de producción",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["animalId", "tipoProduccion", "cantidad"],
+                "properties": {
+                  "animalId": {
+                    "type": "integer"
+                  },
+                  "tipoProduccion": {
+                    "type": "string",
+                    "enum": ["leche", "carne"]
+                  },
+                  "cantidad": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "fechaRegistro": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Registro de producción creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Registro de producción creado exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Produccion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Animal no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/produccion/{id}": {
+      "get": {
+        "tags": ["Producción"],
+        "summary": "Obtener un registro de producción por ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del registro de producción"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registro de producción",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Produccion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Producción"],
+        "summary": "Actualizar un registro de producción",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del registro de producción"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tipoProduccion": {
+                    "type": "string",
+                    "enum": ["leche", "carne"]
+                  },
+                  "cantidad": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "fechaRegistro": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registro de producción actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Registro de producción actualizado exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Produccion"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Producción"],
+        "summary": "Eliminar un registro de producción",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del registro de producción"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registro de producción eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Registro de producción eliminado exitosamente"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    },
+    "/api/produccion/reporte": {
+      "get": {
+        "tags": ["Producción"],
+        "summary": "Generar reporte de producción",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "periodo",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["diario", "semanal", "mensual"]
+            },
+            "description": "Periodo para el reporte"
+          },
+          {
+            "in": "query",
+            "name": "tipoProduccion",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["leche", "carne"]
+            },
+            "description": "Tipo de producción para el reporte"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reporte de producción generado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "periodo": {
+                          "type": "string",
+                          "example": "diario"
+                        },
+                        "tipoProduccion": {
+                          "type": "string",
+                          "example": "leche"
+                        },
+                        "reporte": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "periodo": {
+                                "type": "string",
+                                "example": "2023-05-20"
+                              },
+                              "totalProduccion": {
+                                "type": "number",
+                                "example": 53.3
+                              },
+                              "cantidadAnimales": {
+                                "type": "integer",
+                                "example": 1
+                              },
+                              "promedioProduccion": {
+                                "type": "number",
+                                "example": 26.65
+                              }
+                            }
+                          }
+                        },
+                        "alerta": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": "¡Alerta! No se ha registrado producción de leche en los últimos 7 días."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros inválidos"
+          },
+          "401": {
+            "description": "No autorizado"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    }
+  }
+}

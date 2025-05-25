@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test API Ganado</title>
+  <style>
+    body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
+    pre { background: #f0f0f0; padding: 10px; border-radius: 5px; overflow: auto; }
+    button { padding: 10px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Test API Ganado</h1>
+  
+  <div>
+    <label for="token">Token JWT:</label>
+    <input type="text" id="token" style="width: 100%; padding: 8px; margin: 10px 0;" 
+           placeholder="Pega tu token JWT aquí">
+    <button onclick="testAPI()">Probar API</button>
+  </div>
+  
+  <div id="result" style="margin-top: 20px;"></div>
+
+  <script>
+    // Función para probar la API
+    function testAPI() {
+      const token = document.getElementById('token').value;
+      const resultDiv = document.getElementById('result');
+      
+      if (!token) {
+        resultDiv.innerHTML = '<p style="color: red;">Error: Debes ingresar un token JWT</p>';
+        return;
+      }
+      
+      resultDiv.innerHTML = '<p>Cargando...</p>';
+      
+      fetch('http://localhost:3000/api/ganado', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        resultDiv.innerHTML = `
+          <h3>Respuesta:</h3>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+        `;
+      })
+      .catch(error => {
+        resultDiv.innerHTML = `
+          <p style="color: red;">Error: ${error.message}</p>
+        `;
+      });
+    }
+    
+    // Cargar token desde localStorage si existe
+    window.onload = function() {
+      const savedToken = localStorage.getItem('token');
+      if (savedToken) {
+        document.getElementById('token').value = savedToken;
+      }
+    };
+  </script>
+</body>
+</html>
