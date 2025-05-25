@@ -12,8 +12,6 @@ Este proyecto es un sistema de backend robusto y seguro para registrar y hacer s
 - **MySQL** - Base de datos relacional
 - **JWT** - Autenticación y autorización
 - **Bcrypt** - Encriptación de contraseñas
-- **Helmet** - Protección de encabezados HTTP
-- **Express Rate Limit** - Limitación de tasa de solicitudes
 - **Swagger UI** - Documentación interactiva de la API
 - **Jest** - Framework de pruebas
 - **Supertest** - Pruebas de API
@@ -29,14 +27,7 @@ Este proyecto es un sistema de backend robusto y seguro para registrar y hacer s
 - ✅ **Registro de intentos de acceso no autorizado** para auditoría
 - ✅ **Pruebas automatizadas** para verificar la protección BOLA
 
-### API4:2023 - Protección contra Consumo de Recursos Sin Restricciones
-- ✅ **Rate limiting** diferenciado por tipo de endpoint
-- ✅ **Limitación del tamaño del payload** (100KB máximo)
-- ✅ **Validación de profundidad de objetos JSON** (10 niveles máximo)
-- ✅ **Protección contra ataques DoS**
-
 ### Seguridad General
-- ✅ **Encabezados HTTP seguros** con Helmet
 - ✅ **Autenticación JWT** robusta
 - ✅ **Encriptación de contraseñas** con bcrypt
 - ✅ **Validación de entrada** en todos los endpoints
@@ -136,24 +127,12 @@ npm run test:coverage
 
 ### Pruebas de Seguridad API
 
-#### Usando Jest (Recomendado)
+#### Usando Jest 
 Las pruebas automatizadas verifican:
 - ✅ Protección contra acceso no autorizado a recursos
 - ✅ Filtrado correcto en consultas masivas
 - ✅ Prevención de modificación de recursos ajenos
 - ✅ Validación de autorización en creación de recursos
-
-#### Usando Postman
-1. Importa la colección de Postman (disponible en `/docs/postman/`)
-2. Configura el entorno con las variables necesarias
-3. Ejecuta las pruebas de seguridad en el siguiente orden:
-   - Crear usuarios de prueba
-   - Crear recursos con cada usuario
-   - Intentar acceso no autorizado (debe fallar con 403)
-   - Verificar filtrado correcto
-
-#### Usando cURL/PowerShell
-Consulta la documentación detallada en `/docs/security-testing.md` para comandos específicos.
 
 ---
 
@@ -184,19 +163,6 @@ Consulta la documentación detallada en `/docs/security-testing.md` para comando
 
 ---
 
-## 🔒 Límites de Seguridad
-
-### Rate Limiting
-- **Autenticación**: 30 solicitudes por 15 minutos
-- **API General**: 100 solicitudes por 5 minutos
-- **Endpoints Sensibles**: 50 solicitudes por 10 minutos
-
-### Limitaciones de Payload
-- **Tamaño máximo**: 100KB por solicitud
-- **Profundidad máxima**: 10 niveles de anidamiento en JSON
-
----
-
 ## 🧪 Verificación de Seguridad
 
 ### Pruebas BOLA (Broken Object Level Authorization)
@@ -216,61 +182,6 @@ Para verificar que la protección contra BOLA funciona correctamente:
 
 ---
 
-## 📁 Estructura del proyecto
-
-\`\`\`
-├── controllers/           # Lógica de negocio
-│   ├── authController.js
-│   ├── ganadoController.js
-│   └── produccionController.js
-├── middlewares/          # Middlewares de seguridad
-│   ├── auth.js          # Autenticación JWT
-│   ├── objectLevelAuth.js # Protección BOLA
-│   ├── rateLimiter.js   # Limitación de tasa
-│   └── payloadLimiter.js # Limitación de payload
-├── models/              # Modelos de Sequelize
-│   ├── usuario.js
-│   ├── ganado.js
-│   ├── produccion.js
-│   └── index.js
-├── routes/              # Rutas de la API
-│   ├── auth.js
-│   ├── ganado.js
-│   └── produccion.js
-├── tests/               # Pruebas automatizadas
-│   ├── auth.test.js
-│   ├── ganado.test.js
-│   ├── produccion.test.js
-│   ├── objectLevelAuth.test.js
-│   └── setup.js
-├── docs/                # Documentación
-│   ├── security.md
-│   ├── security-bola.md
-│   └── api-documentation.md
-├── config/              # Configuración
-│   └── database.js
-├── migrations/          # Migraciones de base de datos
-├── swagger.json         # Documentación OpenAPI
-├── app.js              # Configuración de Express
-├── server.js           # Punto de entrada
-└── README.md           # Este archivo
-\`\`\`
-
----
-
-## 🔍 Monitoreo y Logs
-
-### Eventos de Seguridad Registrados
-- Intentos de acceso no autorizado a recursos
-- Violaciones de rate limiting
-- Payloads que exceden los límites establecidos
-- Intentos de autenticación fallidos
-
-### Ubicación de Logs
-Los logs de seguridad se muestran en la consola del servidor y pueden configurarse para enviarse a sistemas de monitoreo externos.
-
----
-
 ## 🚀 Despliegue en Producción
 
 ### Variables de Entorno Requeridas
@@ -284,70 +195,14 @@ DB_HOST=host_base_datos
 JWT_SECRET=clave_jwt_muy_segura_y_larga
 \`\`\`
 
-### Consideraciones de Seguridad
-- Usar HTTPS en producción
-- Configurar firewall para limitar acceso a la base de datos
-- Implementar rotación de claves JWT
-- Configurar monitoreo de logs de seguridad
-- Realizar auditorías de seguridad regulares
-
 ---
 
-## 📚 Documentación Adicional
-
-- [Documentación de Seguridad BOLA](./docs/security-bola.md)
-- [Documentación de Rate Limiting](./docs/security.md)
-- [Guía de Pruebas de Seguridad](./docs/security-testing.md)
-- [Documentación de la API](http://localhost:3000/api-docs)
-
----
-
-## 🤝 Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Ejecuta las pruebas (`npm test`)
-4. Commit tus cambios (`git commit -am 'Añadir nueva funcionalidad'`)
-5. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-6. Crea un Pull Request
-
-### Estándares de Seguridad
-- Todas las nuevas funcionalidades deben incluir pruebas de seguridad
-- Seguir las mejores prácticas de OWASP API Security Top 10
-- Documentar cualquier nueva vulnerabilidad identificada y su mitigación
-
----
 
 ## 🏆 Cumplimiento de Estándares
 
 Este proyecto implementa protecciones contra las siguientes vulnerabilidades del **OWASP API Security Top 10 (2023)**:
 
 - ✅ **API1:2023** - Broken Object Level Authorization
-- ✅ **API4:2023** - Unrestricted Resource Consumption
-- 🔄 **Próximamente**: Implementación de protecciones adicionales
-
----
-
-## 📞 Soporte
-
-Para reportar vulnerabilidades de seguridad o problemas relacionados con la protección BOLA:
-
-- Crea un issue en GitHub con la etiqueta `security`
-- Incluye pasos detallados para reproducir el problema
-- Proporciona logs relevantes (sin información sensible)
-
-
-### Características de Seguridad
-Implementación de protecciones contra vulnerabilidades OWASP API Security Top 10, con enfoque especial en:
-- Broken Object Level Authorization (BOLA)
-- Unrestricted Resource Consumption
-- Mejores prácticas de autenticación y autorización
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
 ---
 
